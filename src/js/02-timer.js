@@ -1,16 +1,57 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const input = document.querySelector('#datetime-picker');
-const startBtn = document.querySelector('button[data-start]');
-const daysEl = document.querySelector('span[data-days]');
-const hoursEl = document.querySelector('span[data-hours]');
-const minsEl = document.querySelector('span[data-minutes]');
-const secsEl = document.querySelector('span[data-seconds]');
+const refs = {
+  input: document.querySelector('#datetime-picker'),
+  startBtn: document.querySelector('button[data-start]'),
+  hoursEl: document.querySelector('span[data-hours]'),
+  daysEl: document.querySelector('span[data-days]'),
+  minsEl: document.querySelector('span[data-minutes]'),
+  secsEl: document.querySelector('span[data-seconds]'),
+};
 
-startBtn.disabled = true;
+class CountdownTimer {
+  constructor({ onTick }) {
+    this.intervalId = null;
+    this.isActive = false;
+    this.onTick = onTick;
+  }
+
+  start() {
+    if (this.isActive) {
+      return;
+    }
+
+    const startTime = new Date(selectedDate);
+    this.isActive = true;
+
+    this.intervalId = setInterval(() => {
+      const currentTime = Date.now();
+      const deltaTime = startTime - currentTime;
+      const timeComponents = convertMs(deltaTime);
+
+      if (
+        timeComponents.days === `00` &&
+        timeComponents.hours === `00` &&
+        timeComponents.minutes === `00` &&
+        timeComponents.seconds === `00`
+      ) {
+        timer.stop();
+      }
+      this.onTick(timeComponents);
+    }, 1000);
+  }
+
+  stop() {
+    clearInterval(this.intervalId);
+    this.isActive = false;
+  }
+}
+
+refs.startBtn.disabled = true;
 
 let selectedDate = null;
+
 // Show alert once selected date is < than current date (today)
 
 const options = {
@@ -22,7 +63,7 @@ const options = {
     if (selectedDates[0] < Date.now()) {
       window.alert(`Please choose a date in the future`);
     } else {
-      startBtn.disabled = false;
+      refs.startBtn.disabled = false;
 
       selectedDate = selectedDates[0];
 
@@ -33,7 +74,7 @@ const options = {
 
 // Show calendar after clicking on the input field
 
-flatpickr(input, options);
+flatpickr(refs.input, options);
 
 // Convert milliseconds
 
@@ -66,47 +107,19 @@ function addLeadingZero(value) {
 
 // Start countdown after clicking 'Start' button
 
-const timer = {
-  intervalId: null,
-  isActive: false,
-
-  start() {
-    if (this.isActive) {
-      return;
-    }
-
-    const startTime = new Date(selectedDate);
-    this.isActive = true;
-
-    this.intervalId = setInterval(() => {
-      const currentTime = Date.now();
-      const deltaTime = startTime - currentTime;
-      const timeComponents = convertMs(deltaTime);
-
-      if (
-        timeComponents.days === `00` &&
-        timeComponents.hours === `00` &&
-        timeComponents.minutes === `00` &&
-        timeComponents.seconds === `00`
-      ) {
-        timer.stop();
-      }
-
-      daysEl.textContent = timeComponents.days;
-      hoursEl.textContent = timeComponents.hours;
-      minsEl.textContent = timeComponents.minutes;
-      secsEl.textContent = timeComponents.seconds;
-
-      console.log(timeComponents);
-    }, 1000);
-  },
-
-  stop() {
-    clearInterval(this.intervalId);
-    this.isActive = false;
-  },
-};
-
-startBtn.addEventListener('click', () => {
+refs.startBtn.addEventListener('click', () => {
   timer.start();
 });
+
+// Update span elements
+
+function onTickHandler({ days, hours, minutes, seconds }) {
+  refs.daysEl.textContent = days;
+  refs.hoursEl.textContent = hours;
+  refs.minsEl.textContent = minutes;
+  refs.secsEl.textContent = seconds;
+}
+
+// Create instance of CountdownTimer
+
+const timer = new CountdownTimer({ onTick: onTickHandler });
