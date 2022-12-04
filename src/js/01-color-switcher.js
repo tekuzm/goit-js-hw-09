@@ -1,17 +1,19 @@
 const refs = {
-  startBtn: document.querySelector('button[data-start]'),
-  stopBtn: document.querySelector('button[data-stop]'),
+  startBtnEl: document.querySelector('button[data-start]'),
+  stopBtnEl: document.querySelector('button[data-stop]'),
 };
 
 class ColorSwitch {
-  constructor() {
+  constructor({ startBtn, stopBtn }) {
     this.intervalId = null;
-    refs.stopBtn.disabled = true;
+    this.startBtn = startBtn;
+    this.stopBtn = stopBtn;
+    this.stopBtn.disabled = true;
   }
 
   start() {
-    refs.startBtn.disabled = true;
-    refs.stopBtn.disabled = false;
+    this.startBtn.disabled = true;
+    this.stopBtn.disabled = false;
 
     this.intervalId = setInterval(() => {
       document.body.style.backgroundColor = getRandomHexColor();
@@ -21,8 +23,8 @@ class ColorSwitch {
   stop() {
     clearInterval(this.intervalId);
 
-    refs.startBtn.disabled = false;
-    refs.stopBtn.disabled = true;
+    this.startBtn.disabled = false;
+    this.stopBtn.disabled = true;
   }
 }
 
@@ -34,16 +36,19 @@ function getRandomHexColor() {
 
 // Create instance of ColorSwitch
 
-const switcher = new ColorSwitch();
+const switcher = new ColorSwitch({
+  startBtn: refs.startBtnEl,
+  stopBtn: refs.stopBtnEl,
+});
 
 // Start color switching after clicking 'Start' button
 
-refs.startBtn.addEventListener('click', () => {
+refs.startBtnEl.addEventListener('click', () => {
   switcher.start();
 });
 
 // Stop color switching after clicking 'Stop' button
 
-refs.stopBtn.addEventListener('click', () => {
+refs.stopBtnEl.addEventListener('click', () => {
   switcher.stop();
 });
