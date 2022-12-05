@@ -8,6 +8,8 @@ const refs = {
   submitBtnEl: document.querySelector('button'),
 };
 
+// Create promise
+
 function createPromise(position, delay) {
   return new Promise((resolve, reject) => {
     const shouldResolve = Math.random() > 0.3;
@@ -22,14 +24,16 @@ function createPromise(position, delay) {
   });
 }
 
-//
+// Set time of promises returning
 
 function onCreatePromise(e) {
   e.preventDefault();
   const amount = Number(refs.amountField.value);
+  const firstDelay = Number(refs.delayStepField.value);
+  const delayStep = Number(refs.delayStepField.value);
 
   for (let i = 0; i < amount; i++) {
-    createPromise()
+    createPromise(1 + i, firstDelay + delayStep * i)
       .then(({ position, delay }) => {
         Notiflix.Notify.success(
           `✅ Fulfilled promise ${position} in ${delay}ms`
