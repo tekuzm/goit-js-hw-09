@@ -29,11 +29,11 @@ function createPromise(position, delay) {
 function onCreatePromise(e) {
   e.preventDefault();
   const amount = Number(refs.amountField.value);
-  const firstDelay = Number(refs.delayStepField.value);
+  const firstDelay = Number(refs.firstDelayField.value);
   const delayStep = Number(refs.delayStepField.value);
 
   for (let i = 0; i < amount; i++) {
-    createPromise(1 + i, firstDelay + delayStep * i)
+    createPromise(1 + i, firstDelay + i * delayStep)
       .then(({ position, delay }) => {
         Notiflix.Notify.success(
           `✅ Fulfilled promise ${position} in ${delay}ms`
